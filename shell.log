@@ -1,0 +1,25 @@
+1761039839303:hello
+1761039841972:help
+1761040027439:hello
+1761040081645:bye
+1761040084163:exit
+1761040610215:project-root
+1761040623350:list-java
+1761040629965:list-files
+1761040648099:# Analyze a file with AI
+1761040648109:shell:> analyze-file src/main/java/com/project/ai/shell/commands/HelloCommands.java
+1761040648112:# Explain code
+1761040648119:shell:> explain-code src/main/java/com/project/ai/shell/commands/HelloCommands.java
+1761040648123:# Review code for improvements
+1761040648129:shell:> review-code src/main/java/com/project/ai/shell/commands/HelloCommands.java
+1761040648134:# Ask a specific question about a file
+1761040648139:shell:> ask-about-file pom.xml "What dependencies are being used?"
+1761040648142:# Compare two files
+1761040648147:shell:> compare-files file1.java file2.java
+1761040648151:# Summarize entire project
+1761040664887:shell:> summarize-projectsummarize-project
+1761040676562:exit
+1761040696456:list-java
+1761040717431:summarize-project
+1761041849185:�hlep
+1761041850864:help
