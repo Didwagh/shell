@@ -1,5 +1,6 @@
 package com.project.ai.shell.service;
 
+import com.project.ai.shell.records.FileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,50 +17,13 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileService {
 
-    private Path projectRoot;
-    private final Path defaultProjectRoot;
+    private final Path projectRoot;
 
     public FileService() {
-        // Get the project root directory with fallback
+        // Get the project root directory
+//        this.projectRoot = Paths.get(System.getProperty("user.dir"));
         this.projectRoot = Paths.get(System.getProperty("project.path", System.getProperty("user.dir")));
-        this.defaultProjectRoot = this.projectRoot;
-        log.info("Project root set to: {}", projectRoot.toAbsolutePath());
-    }
-
-    /**
-     * Switch to a different project directory
-     */
-    public String switchProject(String newPath) {
-        Path newProjectRoot = Paths.get(newPath);
-
-        if (!Files.exists(newProjectRoot)) {
-            return "Error: Directory does not exist: " + newPath;
-        }
-
-        if (!Files.isDirectory(newProjectRoot)) {
-            return "Error: Path is not a directory: " + newPath;
-        }
-
-        this.projectRoot = newProjectRoot.toAbsolutePath();
-        log.info("Switched project root to: {}", projectRoot);
-
-        return "Successfully switched to project: " + projectRoot;
-    }
-
-    /**
-     * Reset to the default project directory
-     */
-    public String resetToDefault() {
-        this.projectRoot = this.defaultProjectRoot;
-        log.info("Reset project root to: {}", projectRoot);
-        return "Reset to default project: " + projectRoot;
-    }
-
-    /**
-     * Get current project root
-     */
-    public Path getProjectRoot() {
-        return projectRoot;
+        log.info("Project root set to: {}", projectRoot);
     }
 
     /**
@@ -101,6 +66,31 @@ public class FileService {
         }
     }
 
+
+    //getiing all files with info
+    public List<FileInfo> listAllFilesWithTime() throws IOException {
+        try (Stream<Path> paths = Files.walk(projectRoot)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(this::shouldIncludeFile)
+                    .map(path -> new FileInfo(
+                            projectRoot.relativize(path).toString(),
+                            getLastModifiedTime(path)
+                    ))
+                    .sorted(Comparator.comparing(FileInfo::relativePath))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private long getLastModifiedTime(Path path) {
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (IOException e) {
+            return 0L;
+        }
+    }
+
+
     /**
      * List only Java files
      */
@@ -109,24 +99,6 @@ public class FileService {
             return paths
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
-                    .filter(this::shouldIncludeFile)
-                    .map(projectRoot::relativize)
-                    .map(Path::toString)
-                    .sorted()
-                    .collect(Collectors.toList());
-        }
-    }
-
-    /**
-     * List files by extension
-     */
-    public List<String> listFilesByExtension(String extension) throws IOException {
-        String ext = extension.startsWith(".") ? extension : "." + extension;
-
-        try (Stream<Path> paths = Files.walk(projectRoot)) {
-            return paths
-                    .filter(Files::isRegularFile)
-                    .filter(p -> p.toString().endsWith(ext))
                     .filter(this::shouldIncludeFile)
                     .map(projectRoot::relativize)
                     .map(Path::toString)
@@ -158,23 +130,6 @@ public class FileService {
     }
 
     /**
-     * Read a file from an absolute path (useful for cross-project operations)
-     */
-    public String readFileAbsolute(String absolutePath) throws IOException {
-        Path filePath = Paths.get(absolutePath);
-
-        if (!Files.exists(filePath)) {
-            throw new IOException("File does not exist: " + absolutePath);
-        }
-
-        if (!Files.isRegularFile(filePath)) {
-            throw new IOException("Path is not a file: " + absolutePath);
-        }
-
-        return Files.readString(filePath);
-    }
-
-    /**
      * Get file information
      */
     public String getFileInfo(String relativePath) throws IOException {
@@ -187,9 +142,8 @@ public class FileService {
         long size = Files.size(filePath);
         String sizeStr = formatFileSize(size);
 
-        return String.format("File: %s\nFull path: %s\nSize: %s (%d bytes)\nReadable: %s\nWritable: %s",
+        return String.format("File: %s\nSize: %s (%d bytes)\nReadable: %s\nWritable: %s",
                 relativePath,
-                filePath.toAbsolutePath(),
                 sizeStr,
                 size,
                 Files.isReadable(filePath),
@@ -215,30 +169,6 @@ public class FileService {
     }
 
     /**
-     * Get project structure summary
-     */
-    public String getProjectStructure() throws IOException {
-        StringBuilder structure = new StringBuilder();
-        structure.append("Project: ").append(projectRoot.toAbsolutePath()).append("\n");
-        structure.append("─".repeat(50)).append("\n");
-
-        // Count file types
-        var allFiles = listAllFiles();
-        long javaFiles = allFiles.stream().filter(f -> f.endsWith(".java")).count();
-        long xmlFiles = allFiles.stream().filter(f -> f.endsWith(".xml")).count();
-        long yamlFiles = allFiles.stream().filter(f -> f.endsWith(".yml") || f.endsWith(".yaml")).count();
-        long propsFiles = allFiles.stream().filter(f -> f.endsWith(".properties")).count();
-
-        structure.append("Total files: ").append(allFiles.size()).append("\n");
-        structure.append("Java files: ").append(javaFiles).append("\n");
-        structure.append("XML files: ").append(xmlFiles).append("\n");
-        structure.append("YAML files: ").append(yamlFiles).append("\n");
-        structure.append("Properties files: ").append(propsFiles).append("\n");
-
-        return structure.toString();
-    }
-
-    /**
      * Filter out files we don't want to include (like target/, .git/, etc.)
      */
     private boolean shouldIncludeFile(Path path) {
@@ -248,8 +178,6 @@ public class FileService {
                 !pathStr.contains(".idea" + System.getProperty("file.separator")) &&
                 !pathStr.contains("node_modules" + System.getProperty("file.separator")) &&
                 !pathStr.contains(".mvn" + System.getProperty("file.separator")) &&
-                !pathStr.contains("build" + System.getProperty("file.separator")) &&
-                !pathStr.contains("dist" + System.getProperty("file.separator")) &&
                 !pathStr.endsWith(".class");
     }
 
@@ -261,5 +189,9 @@ public class FileService {
         int exp = (int) (Math.log(size) / Math.log(1024));
         String pre = "KMGTPE".charAt(exp - 1) + "";
         return String.format("%.1f %sB", size / Math.pow(1024, exp), pre);
+    }
+
+    public Path getProjectRoot() {
+        return projectRoot;
     }
 }
