@@ -1,6 +1,8 @@
 package com.project.ai.shell.commands;
 
+import com.project.ai.shell.model.TrackedFile;
 import com.project.ai.shell.records.FileInfo;
+import com.project.ai.shell.repo.TrackedFileRepo;
 import com.project.ai.shell.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
@@ -9,6 +11,8 @@ import org.springframework.shell.standard.ShellOption;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @ShellComponent
@@ -16,6 +20,7 @@ import java.util.List;
 public class FileCommands {
 
     private final FileService fileService;
+    private final TrackedFileRepo trackedFileRepo;
 
     @ShellMethod(key = "list-files", value = "List all files in the project")
     public String listFiles() {
@@ -45,28 +50,60 @@ public class FileCommands {
 
 
 //getting all files with time
-    @ShellMethod(key = "list-files-time", value = "List all files in the project")
-    public String listFilesWithTime() {
-        try {
-            List<FileInfo> files = fileService.listAllFilesWithTime();
+@ShellMethod(key = "list-files-time", value = "List all files in the project")
+public String listFilesWithTime() {
+    try {
+        List<FileInfo> files = fileService.listAllFilesWithTime();
 
-            if (files.isEmpty()) return "No files found.";
+        if (files.isEmpty()) return "No files found.";
 
-            StringBuilder result = new StringBuilder();
-            result.append(String.format("Found %d files:\n", files.size()));
-            result.append("─".repeat(60)).append("\n");
+        StringBuilder result = new StringBuilder();
+        result.append(String.format("Found %d files:\n", files.size()));
+        result.append("─".repeat(60)).append("\n");
 
-            for (FileInfo file : files) {
-                result.append(String.format("  %-50s | %s\n",
-                        file.relativePath(),
-                        Instant.ofEpochMilli(file.lastModifiedTime())));
-            }
-
-            return result.toString();
-        } catch (IOException e) {
-            return "Error listing files: " + e.getMessage();
+        for (FileInfo file : files) {
+            result.append(String.format("  %-50s | %s\n",
+                    file.relativePath(),
+                    Instant.ofEpochMilli(file.lastModifiedTime())));
         }
+
+        for (FileInfo file : files) {
+            trackedFileRepo.findByFilePath(file.relativePath()).ifPresentOrElse(trackedFile -> {
+                // File already tracked → check if modified
+                LocalDateTime currentModified = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(file.lastModifiedTime()),
+                        ZoneId.systemDefault()
+                );
+
+                if (currentModified.isAfter(trackedFile.getLastModifiedTime())) {
+                    System.out.println("UPDATED: " + file.relativePath());
+                    trackedFile.setLastModifiedTime(currentModified);
+                    trackedFileRepo.save(trackedFile);
+                }
+
+            }, () -> {
+                // New file → add it to tracking
+                LocalDateTime modifiedTime = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(file.lastModifiedTime()),
+                        ZoneId.systemDefault()
+                );
+
+                TrackedFile newTracked = TrackedFile.builder()
+                        .filePath(file.relativePath())
+                        .lastModifiedTime(modifiedTime)
+                        .build();
+
+                trackedFileRepo.save(newTracked);
+                System.out.println("NEW FILE: " + file.relativePath());
+            });
+        }
+
+        return result.toString();
+
+    } catch (IOException e) {
+        return "Error listing files: " + e.getMessage();
     }
+}
 
 
 
