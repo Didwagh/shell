@@ -191,6 +191,29 @@ public class FileService {
         return String.format("%.1f %sB", size / Math.pow(1024, exp), pre);
     }
 
+
+    /**
+     * Write content to a file (creates or overwrites)
+     */
+    public void writeFile(String relativePath, String content) throws IOException {
+        Path filePath = projectRoot.resolve(relativePath);
+
+        // Security check: ensure the file is within project root
+        if (!filePath.normalize().startsWith(projectRoot.normalize())) {
+            throw new IOException("Access denied: File is outside project directory");
+        }
+
+        // Create parent directories if they don't exist
+        Path parentDir = filePath.getParent();
+        if (parentDir != null && !Files.exists(parentDir)) {
+            Files.createDirectories(parentDir);
+        }
+
+        // Write the content to the file
+        Files.writeString(filePath, content);
+        log.info("File written successfully: {}", relativePath);
+    }
+
     public Path getProjectRoot() {
         return projectRoot;
     }

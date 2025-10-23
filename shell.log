@@ -27,3 +27,67 @@
 1761043043755:list-files
 1761044195039:�list-files-time
 1761044206911:list-files-time
+1761134334132:�help
+1761134357190:list-files-time
+1761134631926:list-files
+1761134923012:scan
+1761135319903:list-files-time
+1761135358349:lilist-file-time
+1761135362942:list-file-time
+1761135370390:list-files-time
+1761135559229:hello
+1761144203387:hello do i have a cmd which will say bye world ?
+1761144254349:say hello
+1761144279630:help
+1761144430569:hello
+1761144441528:"" hello
+1761145089028:hello there
+1761145101879:bye
+1761145340914:hello there
+1761145352843:say goodbye
+1761145600019:shell are you fine
+1761145904993:gsw
+1761146372368:hello
+1761146672741:hello there ai
+1761146816911:shell
+1761146980815:hello there
+1761147262421:hello
+1761147738357:hello there
+1761148138839:hallo there
+1761197414502:hello
+1761197425748:help
+1761197454594:ask hello ai
+1761197486572:can you retirve pom.xml and tell me it content ?
+1761197501965:ask can you retirve pom.xml and tell me its content
+1761197603285:hello there
+1761197607628:ask hello there
+1761197658415:fetch Allfilecommands for me and tell me if it is in commented for or not commented form
+1761197684143:ask fetch all filecmd for me and tell me if all of its contenet is commented or not
+1761197718772:ask pom.xml what is its path
+1761198309490:ask can you edit a file its name is temp , make it a file which has main fucntion
+1761198422424:ask can you update file named temp and make add it the main fucntion
+1761198466016:ask can yo update file named temp , make it have main fucntion
+1761198553664:ask can you update temp file , make it have main fucntion
+1761198605012:list all files in the project
+1761198612067:ask list all files in project
+1761198641517:ask tell me relative path of all files in project
+1761198699688:ask can you update the file named temp it is directly in - src\\\\main\\\\java\\\\com\\\\project\\\\ai\\\\shell\\\\temp.java make it have main function
+1761198755950:ask can you update the file named temp it is directly in - src\\\\main\\\\java\\\\com\\\\project\\\\ai\\\\shell\\\\temp.java make it have main function print a hello world in it
+1761199255922:ask update a temp file and generate a file which will print hello world and then will print 1 to 100
+1761199307494:tell me relative path of file name temp
+1761199317580:ask tell me relative path of file name temp
+1761199338024:ask update a temp.java file and generate a file which will print hello world and then will print 1 to 100
+1761199412827:ask update temp.java make it have main fucntion and also sout the 1 to 100 in it
+1761199487515:ask update a temp file and generate a file which will print hello world and then will print 1 to 100 and also give me update code here
+1761199587833:ask update a pom.xml wirte comment int it which will as follow "hello my world are you there"
+1761199864520:ask update temp.java make it have main fucintion which prints 1 to 100
+1761200064162:ask update temp.java make it have main function which print s 1 to hundered
+1761200176775:ask edit temp.java add pvsm and hello world
+1761200290135:ask update hello.txt write a function which princt prime number till ten
+1761200341632:ask update hello.txt write a function which princt prime number till ten java
+1761200373938:ask update hello.txt write a function which princt prime number till ten and then just write hello world in normal string
+1761200474472:ask update hello.txt write a function which princt prime number till ten in java also print the hello world
+1761200725237:ask can you update the hello.txt for me generate a code which will be of armstrong nuber and print the number
+1761200788959:ask can you update the hello.txt for me generate a code which will be of armstrong nuber and print the number I do not want to execute it so no need to create seprate .py file just edit it in hello.txt
+1761200993249:ask generate a complex django REST API application with authentication in hello.txt
+1761201023323:ask generate a complex django REST API application with authentication in hello.txt all code in single hello.txt do not ask further questions
