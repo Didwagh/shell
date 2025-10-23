@@ -4,6 +4,8 @@ import com.project.ai.shell.service.FileService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FileTools {
+
+    private static final Logger log = LoggerFactory.getLogger(FileTools.class);
+
 
     private final FileService fileService;
 
@@ -35,6 +40,7 @@ public class FileTools {
     @Tool(name = "writeInFile" , description = "Tool which allows to write in a file / edit a file ")
     public String write(@ToolParam(description = "relative path of file" ) String relativePath, @ToolParam(description = "content you want to write in file" ) String content ) throws IOException {
         fileService.writeFile(relativePath,content);
+        log.info(relativePath + " written to " + content);
         return relativePath + File.separator + content + "successfully updated";
     }
 

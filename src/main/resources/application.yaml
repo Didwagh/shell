@@ -28,9 +28,18 @@ spring:
           text:
             options:
               model: text-embedding-004
+        chat:
+          options:
+            model: gemini-2.0-flash-lite
+
     vectorstore:
       mongodb:
         initialize-schema: true
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
   shell:
     interactive:
       enabled: true
