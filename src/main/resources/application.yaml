@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: newshell
+  datasource:
+    url: jdbc:postgresql://ep-shy-bonus-ad5sk716-pooler.c-2.us-east-1.aws.neon.tech/neondb?user=neondb_owner&password=npg_Sh5tZgscLl0q&sslmode=require&channelBinding=require
+    driver-class-name: org.postgresql.Driver
+
+  data:
+    mongodb:
+      uri: mongodb+srv://sappy:sappy@cluster0.jpshjbn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: vector_db
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        embedding:
+          api-key: ${GEMINI_API_KEY}
+          text:
+            options:
+              model: text-embedding-004
+        chat:
+          options:
+            model: gemini-2.5-flash-lite
+
+
+    vectorstore:
+      mongodb:
+        initialize-schema: true
+        metadata-fields-to-filter: file_path
+        collection-name: newShell
+
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+  shell:
+    interactive:
+      enabled: true
+
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      springframework:
+        shell: TRACE
+
+        ai:
+          chat:
+            client:
+              advisor: DEBUG
